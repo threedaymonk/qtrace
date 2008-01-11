@@ -5,18 +5,19 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   alias_method :__rails_standard_log, :log
   
   def log(sql, name, &blk)
-    if QTrace.match?(sql)
+    sql_without_newlines = sql.gsub(/\s*\n\s*/, ' ')
+    if QTrace.match?(sql_without_newlines)
       begin
         raise FakeException
       rescue FakeException => e
-        ([sql] + e.backtrace[1..-1]).each do |line|
+        ([sql_without_newlines] + e.backtrace[1..-1]).each do |line|
           puts('** '+line) unless line =~ %r{/rails/|/lib/ruby/}
         end
       end
     end
     t0 = Time.now
     ret = __rails_standard_log(sql, name, &blk)
-    QTrace.record(sql, Time.now - t0)
+    QTrace.record(sql_without_newlines, Time.now - t0)
     ret
   end
 end
@@ -69,8 +70,7 @@ class QTrace
     end
     
     def match?(sql)
-      sql_without_newlines = sql.gsub(/\s*\n\s*/, ' ')
-      patterns.any? && sql_without_newlines.match(regexp)
+      patterns.any? && sql.match(regexp)
     end
     
     def show_statistics
