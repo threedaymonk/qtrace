@@ -69,7 +69,8 @@ class QTrace
     end
     
     def match?(sql)
-      patterns.any? && sql.match(regexp)
+      sql_without_newlines = sql.gsub(/\s*\n\s*/, ' ')
+      patterns.any? && sql_without_newlines.match(regexp)
     end
     
     def show_statistics
