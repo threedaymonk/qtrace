@@ -43,6 +43,7 @@ class QTrace
       else
         return
       end
+      tbl.gsub!(/^\`|\`$/, '')
       key = cmd + ' ' + tbl
       statistics[key] ||= [0,0]
       statistics[key][0] += 1
