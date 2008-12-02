@@ -11,7 +11,7 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
         raise FakeException
       rescue FakeException => e
         ([sql_without_newlines] + e.backtrace[1..-1]).each do |line|
-          puts('** '+line) unless line =~ %r{/rails/|/lib/ruby/}
+          RAILS_DEFAULT_LOGGER.debug('** '+line) unless line =~ %r{/rails/|/lib/ruby/}
         end
       end
     end
@@ -106,8 +106,15 @@ class QTrace
         puts('|')
       end
     end
+
+    def load_watchers
+      path = File.join(Rails.root, 'config', 'qtrace.rb')
+      require path if File.exist?(path)
+    end
     
   end
 end
+
+QTrace.load_watchers
 
 END { QTrace.show_statistics }

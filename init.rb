@@ -1,5 +1,5 @@
-if ENV['RAILS_ENV'] == 'development' then
-  require 'qtrace'
+if Rails.env == 'development' then
+  require File.join(File.dirname(__FILE__), 'lib', 'qtrace')
 else
-  require 'qtrace/stub'
+  require File.join(File.dirname(__FILE__), 'lib', 'qtrace', 'stub')
 end
