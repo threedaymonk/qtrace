@@ -1,18 +1,12 @@
 require 'active_record/connection_adapters/abstract_adapter'
 class ActiveRecord::ConnectionAdapters::AbstractAdapter
-  class FakeException < StandardError; end
-  
   alias_method :__rails_standard_log, :log
   
   def log(sql, name, &blk)
     sql_without_newlines = sql.gsub(/\s*\n\s*/, ' ')
     if QTrace.match?(sql_without_newlines)
-      begin
-        raise FakeException
-      rescue FakeException => e
-        ([sql_without_newlines] + e.backtrace[1..-1]).each do |line|
-          RAILS_DEFAULT_LOGGER.debug('** '+line) unless line =~ %r{/rails/|/lib/ruby/}
-        end
+      ([sql_without_newlines] + caller).each do |line|
+        RAILS_DEFAULT_LOGGER.debug('** '+line) unless line =~ %r{/rails/|/lib/ruby/}
       end
     end
     t0 = Time.now
