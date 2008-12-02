@@ -61,7 +61,7 @@ class QTrace
     end
     
     def regexp
-      @regexp ||= Regexp.new(patterns.uniq.join('|'))
+      @regexp ||= Regexp.new(patterns.uniq.join('|'), Regexp::IGNORECASE)
     end
     
     def match?(sql)
